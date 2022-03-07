@@ -1,5 +1,7 @@
 import sys
 
+from matplotlib import animation
+
 
 import vision
 import dataProcess
@@ -8,6 +10,7 @@ import numpy as np
 import Trajectory_calculation as TC
 from loadData import loadData as LD
 from filters import filters as FL
+from simulation import trajectory_simulation as TS
 
 
 def main(dir):
@@ -26,6 +29,7 @@ def main(dir):
     listacc_Z = dataProcess.abnormal_discard(listacc_Z, 0.9)
     a_listacc_X, a_listacc_Y, a_listacc_Z = filters.LowPass(
         listacc_X, listacc_Y, listacc_Z)
+        
 
     # 数值可视化
     # vision.draw_acc(listangle_R, listangle_P, listangle_Y, timestep)  # 原始数据绘图
@@ -54,11 +58,15 @@ def main(dir):
         real_listacc_X.append((listacc_X[i]) * 9.8)
         real_listacc_Y.append((listacc_Y[i]) * 9.8)
         real_listacc_Z.append(((listacc_Z[i]) - 1.00) * 9.8)
+    
     Tra_X, Tra_Y, Tra_Z, V_X, V_Y, V_Z = TC.Trajectory_cal(real_listacc_X, real_listacc_Y, real_listacc_Z, a_listacc_Y, listgyo_X, listgyo_Y, listgyo_Z, listangle_R, listangle_P, listangle_Y, timestep=timestep)
     # 3D运动轨迹仿真可视化
+    Tra_X, Tra_Y, Tra_Z = filters.LowPass(Tra_X, Tra_Y, Tra_Z)
     vision.Trajectory_simulation(Tra_X, Tra_Y, Tra_Z, 'blue')
+    TS(Tra_X, Tra_Y, Tra_Z)
+    
 
 
 if __name__ == '__main__':
-    dir = '../Data/211111135320.txt'
+    dir = '../Data/211111134940.txt'
     main(dir)

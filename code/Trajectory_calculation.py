@@ -1,4 +1,5 @@
 import math
+from filters import filters as FL
 import Zero_Velocity_Update as ZVU
 
 
@@ -6,6 +7,7 @@ def integral(listacc_X, listacc_Y, listacc_Z, Z, listgyo_X, listgyo_Y, listgyo_Z
     # 初始速度=0 初始位移0
     V_ling_index = []
     S_ling_index = []
+    filters = FL()  # 创建过滤器
     V = {}
     V_B={}
     S = {}
@@ -40,12 +42,12 @@ def integral(listacc_X, listacc_Y, listacc_Z, Z, listgyo_X, listgyo_Y, listgyo_Z
     # V = filters.highpass(Vs)
     # V = filters.kalmanFitler(Vs, 0.001)
     # V = dataProcess.abnormal_discard(Vs, 1)
-    V = Vs
+    V = filters.highpass(Vs)
     # vision.draw_satic(Vb[0:3000], Vs[0:3000], timestep[0:3000])
     # vision.draw_satic(V, satic, timestep )
 
     for k in range(1, len(timestep)-10):
-        if V[k]==0 and math.acos(abs(Z[k])%1) < 0.5:   # 零速检测+姿态追踪，reset周期动作初始点
+        if V[k]== 0 and math.acos(abs(Z[k])%1) < 0.3:   # 零速检测+姿态追踪，reset周期动作初始点
             S[k] = 0
             if S[k-1]!= 0:
                 S_ling_index.append(k-1)
@@ -58,7 +60,7 @@ def integral(listacc_X, listacc_Y, listacc_Z, Z, listgyo_X, listgyo_Y, listgyo_Z
         sample_key_list.append(item)
         sample_value_list.append(S[item])
     
-    return sample_value_list
+    return sample_value_list, V
 
 
 def Trajectory_cal(listacc_X, listacc_Y, listacc_Z, Z, listgyo_X, listgyo_Y, listgyo_Z, listangle_R, listangle_P, listangle_Y, timestep):
