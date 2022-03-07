@@ -221,7 +221,7 @@ for k in range(1, len(timestep)-10):
 
 ## 参考
 ### 博客参考
-旋转举证推导:
+旋转矩阵推导:
 https://zhuanlan.zhihu.com/p/183973440
 
 姿态解算:
