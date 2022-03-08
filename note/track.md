@@ -13,7 +13,7 @@ IMU的运动轨迹构建，数据的采集为其中首要也是重要的环节�
 #### IMU坐标系
 IMU坐标系也称为载体坐标系，也就是采集设备自身的坐标系，是相对固定的，JY61模块由三轴构成，分别是X，Y，Z轴。
 
-![avatar](https://github.com/noil-lion/motion-tracking/tree/main/note/pic/axis.png)
+![avatar](./pic/axis.png)
 
 如图所示：若将模块竖直放置在人正前方的桌面，以人的右方向为X轴，Y轴竖直向上，垂直模块向内为Z轴。Z轴的方向定义符合笛卡尔右手系。
 
