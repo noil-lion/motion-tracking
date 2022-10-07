@@ -13,11 +13,11 @@ IMU的运动轨迹构建，数据的采集为其中首要也是重要的环节�
 #### IMU坐标系
 IMU坐标系也称为载体坐标系，也就是采集设备自身的坐标系，是相对固定的，JY61模块由三轴构成，分别是X，Y，Z轴。
 
-![avatar](../pic/axis.png)
+![avatar](./pic/axis.png)
 
 如图所示：若将模块竖直放置在人正前方的桌面，以人的右方向为X轴，Y轴竖直向上，垂直模块向内为Z轴。Z轴的方向定义符合笛卡尔右手系。
 
-![avatar](../pic/right_hand.png)
+![avatar](./pic/right_hand.png)
 
 载体坐标系相对载体本身是固定的，但在运动过程中相对于世界坐标系（参考系系）是在变换的。其中要注意的是，设备输出的欧拉角数据，也就是姿态角数据，是相对于初始的载体坐标系的旋转角度值，如IMU按如图方式放置，其中俯仰角（pitch）为载体绕载体坐标系X轴旋转的角度偏移值，范围为-90-90，横滚（roll）角为载体绕载体坐标系Z轴旋转的角度偏移值,同理航向角（yaw）。
 
@@ -28,7 +28,7 @@ IMU坐标系也称为载体坐标系，也就是采集设备自身的坐标系�
 
 由于实验环境基于地球环境，本文对世界坐标系相对于地球进行描述。
 
-![avatar](../pic/ENU.png)
+![avatar](./pic/ENU.png)
 
 将地球由站心坐标系进行构建，而运动物体在地球表表面的任意位置，其世界坐标系相对于地球而言，定义如下，由于重力方向始终指向地心，则定义世界坐标系Z轴指向与重力方向完全相反，垂直地面指向天（UP），根据笛卡尔坐标系定义，世界坐标系的其他两轴指向相互垂直，其构成平面与地面平行，其中Y轴指向地球北（North），X轴指向东（East）。也就是东北天（ENU）坐标系。
 
@@ -74,15 +74,15 @@ IMU轨迹重建的基本思路为通过对三轴加速度值进行二次积分�
 为求得载体在空间的轨迹位移，首先需要获得载体运动的真实加速度值，也就是获得载体在世界坐标系下的三轴加速度数值，载体坐标系和世界坐标系可看作线性空间中的基坐标系，而载体运动的三轴加速度在线性空间中可表示为一根向量（具有方向和值），直接输出三轴加速度值即为该向量在载体
 坐标系下的坐标 ***（其中还包含了重力加速度 g）***，而构建恰当的旋转矩阵和旋转轴，可以将同一个向量在另一个基座标下的坐标计算得到。
 
-![avatar](../pic/matrix.png)
+![avatar](./pic/matrix.png)
 
 #### 旋转矩阵的构建
 
-![avatar](../pic/rotation.png)
+![avatar](./pic/rotation.png)
 
 由于载体系和世界系在初始时是完全重合，这样，载体系相对于世界系的各轴偏移角度也就通过欧拉角被记录下来，通过欧拉角构建绕各轴旋转的旋转矩阵，并顺序累乘当前的三轴加速度向量，即可得到世界系下的三轴加速度向量（包含g）。https://www.freesion.com/article/58941204625/
 
-![avatar](../pic/rotation_matrix.png)
+![avatar](./pic/rotation_matrix.png)
 
 构建代码：
 
@@ -123,7 +123,7 @@ IMU轨迹重建的基本思路为通过对三轴加速度值进行二次积分�
 
 #### 偏移角是如何能构建旋转矩阵这部分不进行详细赘述，网上有大量资料，这里记录几个注意的要点。
 
-![avatar](../pic/RYP.png)
+![avatar](./pic/RYP.png)
 
 1.分清楚输出的欧拉角与 Roll、Yaw、Pitch的对应关系。分不清楚可以将IMU类比成飞机。
 
@@ -135,14 +135,14 @@ IMU轨迹重建的基本思路为通过对三轴加速度值进行二次积分�
 
 #### 加速度旋转后效果对比
 
-![avatar](../pic/rotation_result.png)
+![avatar](./pic/rotation_result.png)
 
 上图中可以看到经过旋转矩阵进行坐标变化后，Z轴数据能较为明显的体现出旋转后的效果，数据在1.0附件进行波动，这是由于其中包含了1g的重力加速度和载体在世界坐标系下的垂直方向上（Z轴）的运动加速度。
 
 ### 三轴加速度过滤
 为获得IMU在世界系下的三轴运动加速度，要对世界系下Z轴方向的重力进行消去，不同纬度的重力加速度值是不同的，纬度越高，重力加速度越大。
 
-![avatar](../pic/gravity.png)
+![avatar](./pic/gravity.png)
 
 
 ### 位移积分
@@ -151,14 +151,14 @@ IMU轨迹重建的基本思路为通过对三轴加速度值进行二次积分�
 #### 梯形积分
 由于传感器的数据传输频率为100HZ，这意味着获取到的加速度值并非连续值，实际上是离散的数据点，没有实际的曲线对其进行拟合，于是其积分不能基于通用积分方法。本文采用数值积分对加速度进行二次积分。
 
-![avatar](../pic/intergral.png)
+![avatar](./pic/intergral.png)
 
 公式定义为：
 $\int_{a}^{b} f(x) \mathrm{d} x \approx \sum_{i}^{N} \frac{h}{2}\left[f\left(x_{i+1}\right)+f\left(x_{i}\right)\right]=h\left[\frac{1}{2} f\left(x_{1}\right)+\sum_{i=2}^{N} f\left(x_{i}\right)+\frac{1}{2} f\left(x_{N+1}\right)\right]$
 
 对计算得到的世界系下的三轴加速度进行积分，即可得到载体的运动轨迹？天真了 }:-<
 
-![avatar](../pic/track_without_0.png)
+![avatar](./pic/track_without_0.png)
 
 #### 零速检测（区间特征统计）
 
@@ -192,9 +192,9 @@ def detct(listacc_X, listacc_Y, listacc_Z, listgyo_X, listgyo_Y, listgyo_Z, list
 ```
 0速检测效果:
 
-![avatar](../pic/zero_detection.png)
+![avatar](./pic/zero_detection.png)
 
-![avatar](../pic/zero_detection_result.png)
+![avatar](./pic/zero_detection_result.png)
 
 零速检测在很大程度上减小了位移轨迹的不规范问题，消除了一定的测量误差，但实际依旧会有系统累积误差。
 此处添加实验证明。设计对比或计算检测准确率
@@ -216,7 +216,7 @@ for k in range(1, len(timestep)-10):
 #### 轨迹可视化
 最终结果如下图，直观上轨迹的偏移和误差被进一步缩小，待进一步量化实验结果。
 
-![avatar](../pic/final_result.png)
+![avatar](./pic/final_result.png)
 
 
 ## 参考
